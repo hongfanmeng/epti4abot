@@ -94,6 +94,18 @@ hardware_interface::return_type Dfrobot::write(const rclcpp::Time& /*time*/, con
 {
   // TODO(anyone): write robot's commands'
 
+  // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
+  RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Writing...");
+
+  for (auto i = 0u; i < hw_commands_.size(); i++)
+  {
+    // Simulate sending commands to the hardware
+    RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Got command %.5f for '%s'!", hw_commands_[i],
+                info_.joints[i].name.c_str());
+  }
+  RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Joints successfully written!");
+  // END: This part here is for exemplary purposes - Please do not copy to your production code
+
   return hardware_interface::return_type::OK;
 }
 
