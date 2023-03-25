@@ -29,7 +29,8 @@ hardware_interface::CallbackReturn Dfrobot::on_init(const hardware_interface::Ha
   }
 
   // TODO(anyone): read parameters and initialize the hardware
-  hw_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+  hw_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+  hw_velocities_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
   hw_commands_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
 
   return CallbackReturn::SUCCESS;
@@ -48,8 +49,9 @@ std::vector<hardware_interface::StateInterface> Dfrobot::export_state_interfaces
   for (size_t i = 0; i < info_.joints.size(); ++i)
   {
     state_interfaces.emplace_back(hardware_interface::StateInterface(
-        // TODO(anyone): insert correct interfaces
-        info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_states_[i]));
+        info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_positions_[i]));
+    state_interfaces.emplace_back(hardware_interface::StateInterface(
+        info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_velocities_[i]));
   }
 
   return state_interfaces;
@@ -61,8 +63,7 @@ std::vector<hardware_interface::CommandInterface> Dfrobot::export_command_interf
   for (size_t i = 0; i < info_.joints.size(); ++i)
   {
     command_interfaces.emplace_back(hardware_interface::CommandInterface(
-        // TODO(anyone): insert correct interfaces
-        info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_commands_[i]));
+        info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_commands_[i]));
   }
 
   return command_interfaces;
