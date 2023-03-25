@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="robot">
+
+    <!-- define args -->
+    <xacro:arg name="sim_mode" default="true" />
+
+    <!-- Bot core -->
+    <xacro:include filename="$(find epti4abot)/description/diffbot_description.urdf.xacro" />
+    <!-- Colors -->
+    <xacro:include filename="$(find epti4abot)/description/diffbot.materials.xacro" />
+    <!-- ROS2 Control -->
+    <xacro:include filename="ros2_control.xacro" />
+    <!-- Lidar sim -->
+    <!-- <xacro:include filename="lidar.xacro" /> -->
+
+</robot>
