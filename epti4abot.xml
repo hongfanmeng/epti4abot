@@ -1,0 +1,9 @@
+<library path="epti4abot">
+  <class name="epti4abot/Dfrobot"
+    type="epti4abot::Dfrobot"
+    base_class_type="hardware_interface::SystemInterface">
+    <description>
+      ros2_control hardware interface.
+    </description>
+  </class>
+</library>

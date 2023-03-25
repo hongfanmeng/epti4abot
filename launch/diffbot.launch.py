@@ -28,7 +28,7 @@ def generate_launch_description():
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
             PathJoinSubstitution(
-                [FindPackageShare("epti4abot"), "description", "robot.urdf.xacro"]
+                [FindPackageShare("epti4abot"), "description", "diffbot.urdf.xacro"]
             ),
         ]
     )

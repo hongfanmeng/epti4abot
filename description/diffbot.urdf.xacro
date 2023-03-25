@@ -2,15 +2,16 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="robot">
 
     <!-- define args -->
-    <xacro:arg name="sim_mode" default="true" />
+    <xacro:arg name="prefix" default="" />
 
     <!-- Bot core -->
     <xacro:include filename="$(find epti4abot)/description/diffbot_description.urdf.xacro" />
     <!-- Colors -->
     <xacro:include filename="$(find epti4abot)/description/diffbot.materials.xacro" />
     <!-- ROS2 Control -->
-    <xacro:include filename="ros2_control.xacro" />
-    <!-- Lidar sim -->
-    <!-- <xacro:include filename="lidar.xacro" /> -->
+    <xacro:include filename="$(find epti4abot)/description/ros2_control.xacro" />
+
+    <xacro:diffbot prefix="$(arg prefix)" />
+    <xacro:diffbot_ros2_control name="DiffBot" prefix="$(arg prefix)" />
 
 </robot>
