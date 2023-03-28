@@ -14,6 +14,7 @@
 
 #include <limits>
 #include <vector>
+#include <wiringPi.h>
 
 #include "epti4abot/dfrobot.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"

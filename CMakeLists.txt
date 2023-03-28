@@ -17,6 +17,10 @@ add_library(
   SHARED
   src/dfrobot.cpp
 )
+target_link_libraries(
+  epti4abot
+  wiringPi
+)
 target_include_directories(
   epti4abot
   PUBLIC
