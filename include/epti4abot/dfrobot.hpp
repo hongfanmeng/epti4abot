@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "epti4abot/visibility_control.h"
+#include "epti4abot/car_controller.hpp"
 #include "hardware_interface/system_interface.hpp"
 #include "hardware_interface/handle.hpp"
 #include "hardware_interface/hardware_info.hpp"
@@ -63,6 +64,8 @@ private:
 
   // Store the wheeled robot position
   double base_x_, base_y_, base_theta_;
+
+  DF::CarController* controller;
 };
 
 }  // namespace epti4abot

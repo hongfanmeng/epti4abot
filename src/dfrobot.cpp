@@ -16,9 +16,11 @@
 #include <vector>
 #include <wiringPi.h>
 
+#include "epti4abot/car_controller.hpp"
 #include "epti4abot/dfrobot.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "unistd.h"
 
 namespace epti4abot
 {
@@ -74,12 +76,16 @@ hardware_interface::CallbackReturn Dfrobot::on_activate(const rclcpp_lifecycle::
 {
   // TODO(anyone): prepare the robot to receive commands
 
+  controller = new DF::CarController("/dev/ttyACM0", 9600);
+
   return CallbackReturn::SUCCESS;
 }
 
 hardware_interface::CallbackReturn Dfrobot::on_deactivate(const rclcpp_lifecycle::State& /*previous_state*/)
 {
   // TODO(anyone): prepare the robot to stop receiving commands
+
+  delete controller;
 
   return CallbackReturn::SUCCESS;
 }
@@ -98,13 +104,26 @@ hardware_interface::return_type Dfrobot::write(const rclcpp::Time& /*time*/, con
   // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
   RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Writing...");
 
+  double vel_left = hw_commands_[0], vel_right = hw_commands_[1];
+  DF::DIRECTION_enum dir_left = vel_left > 0 ? DF::DIRECTION_enum::DIRECTION_ADV : DF::DIRECTION_enum::DIRECTION_BACK;
+  DF::DIRECTION_enum dir_right = vel_right > 0 ? DF::DIRECTION_enum::DIRECTION_ADV : DF::DIRECTION_enum::DIRECTION_BACK;
+  int speed_left = abs(int(vel_left * 10));
+  int speed_right = abs(int(vel_right * 10));
+  speed_left = min(speed_left, 255);
+  speed_right = min(speed_right, 255);
+
+  controller->setCarLeft(dir_left, speed_left);
+  usleep(10000);
+  controller->setCarRight(dir_right, speed_right);
+  usleep(10000);
+
   for (auto i = 0u; i < hw_commands_.size(); i++)
   {
     // Simulate sending commands to the hardware
     RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Got command %.5f for '%s'!", hw_commands_[i],
                 info_.joints[i].name.c_str());
   }
-  RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Joints successfully written!");
+  // RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Joints successfully written!");
   // END: This part here is for exemplary purposes - Please do not copy to your production code
 
   return hardware_interface::return_type::OK;
