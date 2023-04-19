@@ -14,7 +14,7 @@
 
 #include <limits>
 #include <vector>
-#include <wiringPi.h>
+// #include <wiringPi.h>
 
 #include "epti4abot/car_controller.hpp"
 #include "epti4abot/dfrobot.hpp"
