@@ -10,7 +10,14 @@ find_package(ament_cmake REQUIRED)
 find_package(hardware_interface REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
+
+find_package(sensor_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(tf2_msgs REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 
 add_library(
   epti4abot
@@ -19,19 +26,54 @@ add_library(
 )
 target_link_libraries(
   epti4abot
-  wiringPi
 )
 target_include_directories(
   epti4abot
   PUBLIC
   include
 )
+
+# add_executable(
+#   your_executer path_to_cpp.cpp
+# )
+# target_include_directories(
+#   your_executer
+#   PUBLIC 
+#   include
+#   other_folder
+# )
+# ament_target_dependencies(
+#   your_executer
+#   all_the_package_you_needed
+# )
+
+add_executable(
+  wit_imu_sensor src/witimunode.cpp
+)
+target_include_directories(
+  wit_imu_sensor 
+  PUBLIC 
+  include
+)
+ament_target_dependencies(
+  wit_imu_sensor
+  rclcpp
+  std_msgs
+  tf2_ros
+  sensor_msgs
+  nav_msgs
+  tf2_msgs
+  tf2_geometry_msgs
+  rclcpp_lifecycle
+)
+
 ament_target_dependencies(
   epti4abot
   hardware_interface
   rclcpp
   rclcpp_lifecycle
 )
+
 # prevent pluginlib from using boost
 target_compile_definitions(epti4abot PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 
@@ -50,6 +92,7 @@ install(
   DIRECTORY include/
   DESTINATION include
 )
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -84,7 +127,13 @@ ament_export_dependencies(
   hardware_interface
   pluginlib
   rclcpp
+  std_msgs
   rclcpp_lifecycle
+)
+
+install(TARGETS
+  wit_imu_sensor
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 install(
