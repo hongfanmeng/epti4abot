@@ -38,6 +38,22 @@ public:
     }
   }
 
+  uint8_t inline rad2speed(double rad) {
+	  if (rad < 1) { return 0; }
+	  double ret = 0.6138 * rad * rad + 4.3103 * rad + 57.584;
+	  return static_cast<uint8_t>(std::min(ret, 255.));
+  }
+
+  void setCarLeft(const DIRECTION_enum direction, double rad)
+  {
+	  return setCarLeft(direction, rad2speed(rad));
+  }
+
+  void setCarRight(const DIRECTION_enum direction, double rad)
+  {
+	  return setCarRight(direction, rad2speed(rad));
+  }
+
   void setCarLeft(const DIRECTION_enum direction, uint8_t speed)
   {
     mLeft_.direction = direction;
@@ -57,7 +73,7 @@ public:
     std::stringstream os;
     os << "L " << mLeft_.direction << ' ' << int(mLeft_.speed);
     const std::string command = os.str();
-    // std::cout << command << std::endl;
+    std::cout << command << std::endl;
     while (!serial_.sendline(command))
       usleep(10000);
   }
@@ -67,7 +83,7 @@ public:
     std::stringstream os;
     os << "R " << mRight_.direction << ' ' << int(mRight_.speed);
     const std::string command = os.str();
-    // std::cout << command << std::endl;
+    std::cout << command << std::endl;
     while (!serial_.sendline(command))
       usleep(10000);
   }

@@ -102,27 +102,25 @@ hardware_interface::return_type Dfrobot::write(const rclcpp::Time& /*time*/, con
   // TODO(anyone): write robot's commands'
 
   // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
-  RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Writing...");
+  // RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Writing...");
 
   double vel_left = hw_commands_[0], vel_right = hw_commands_[1];
   DF::DIRECTION_enum dir_left = vel_left > 0 ? DF::DIRECTION_enum::DIRECTION_ADV : DF::DIRECTION_enum::DIRECTION_BACK;
   DF::DIRECTION_enum dir_right = vel_right > 0 ? DF::DIRECTION_enum::DIRECTION_ADV : DF::DIRECTION_enum::DIRECTION_BACK;
-  int speed_left = abs(int(vel_left * 10));
-  int speed_right = abs(int(vel_right * 10));
-  speed_left = min(speed_left, 255);
-  speed_right = min(speed_right, 255);
 
-  controller->setCarLeft(dir_left, speed_left);
+  printf("vel_left: %.3f, vel_right: %.3f\n", vel_left, vel_right);
+
+  controller->setCarLeft(dir_left, abs(vel_left));
   usleep(10000);
-  controller->setCarRight(dir_right, speed_right);
+  controller->setCarRight(dir_right, abs(vel_right));
   usleep(10000);
 
-  for (auto i = 0u; i < hw_commands_.size(); i++)
-  {
-    // Simulate sending commands to the hardware
-    RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Got command %.5f for '%s'!", hw_commands_[i],
-                info_.joints[i].name.c_str());
-  }
+  // for (auto i = 0u; i < hw_commands_.size(); i++)
+  // {
+  //   // Simulate sending commands to the hardware
+  //   RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Got command %.5f for '%s'!", hw_commands_[i],
+  //               info_.joints[i].name.c_str());
+  // }
   // RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"), "Joints successfully written!");
   // END: This part here is for exemplary purposes - Please do not copy to your production code
 
