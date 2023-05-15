@@ -11,6 +11,7 @@ def generate_launch_description():
                 executable="wit_imu_sensor",
                 name="imu_node",
                 output="screen",
+                parameters=[{"port": "/dev/ttyUSB0", "baudrate": 9600}],
             ),
             # TF transform
             Node(
