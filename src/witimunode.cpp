@@ -28,7 +28,7 @@ public:
   {
     int output_hz = 100;
     timer_ms = std::chrono::milliseconds(1000 / output_hz);
-    imu_topic = "WitSensor";
+    frame_id = "wit_sensor";
 
     port = this->declare_parameter<std::string>("port", "/dev/ttyUSB0");
     baudrate = this->declare_parameter<int>("baudrate", 9600);
@@ -115,11 +115,13 @@ private:
       sensor_msgs::msg::Imu imu_offline_data;
       //==============imu data===============
       imu_data.header.stamp = now;
-      imu_data.header.frame_id = imu_topic;
+      imu_data.header.frame_id = frame_id;
 
       imu_data.linear_acceleration.x = imu.acc.x;
       imu_data.linear_acceleration.y = imu.acc.y;
       imu_data.linear_acceleration.z = imu.acc.z;
+
+      RCLCPP_INFO(this->get_logger(), "linear_acc, x=%f, y=%f, z=%f", imu.acc.x, imu.acc.y, imu.acc.z);
 
       imu_data.angular_velocity.x = imu.angle.r * 180.0 / M_PI;
       imu_data.angular_velocity.y = imu.angle.p * 180.0 / M_PI;
@@ -128,19 +130,18 @@ private:
       tf2::Quaternion curr_quater;
       curr_quater.setRPY(imu.angle.r, imu.angle.p, imu.angle.y);  // zyx
 
-      // RCLCPP_INFO(this->get_logger(), "angle: x=%f, y=%f, z=%f",
-      //   imu.angle.r, imu.angle.p, imu.angle.y);
+      RCLCPP_INFO(this->get_logger(), "angular_vel: x=%f, y=%f, z=%f", imu.angle.r, imu.angle.p, imu.angle.y);
 
       imu_data.orientation.x = curr_quater.x();
       imu_data.orientation.y = curr_quater.y();
       imu_data.orientation.z = curr_quater.z();
       imu_data.orientation.w = curr_quater.w();
-      // RCLCPP_INFO(this->get_logger(), "Quaternion: x=%f, y=%f, z=%f, w=%f",
-      //   imu_data.orientation.x, imu_data.orientation.y, imu_data.orientation.z, imu_data.orientation.w);
+      RCLCPP_INFO(this->get_logger(), "orientation: x=%f, y=%f, z=%f, w=%f", imu_data.orientation.x,
+                  imu_data.orientation.y, imu_data.orientation.z, imu_data.orientation.w);
 
       //==============imu offline data===============
       imu_offline_data.header.stamp = now;
-      imu_offline_data.header.frame_id = imu_topic;
+      imu_offline_data.header.frame_id = frame_id;
 
       imu_offline_data.linear_acceleration.x = imu.acc.x;
       imu_offline_data.linear_acceleration.y = imu.acc.y;
@@ -158,7 +159,7 @@ private:
       pub_imu->publish(imu_data);
       pub_imu_offline->publish(imu_offline_data);
       // std::string tmp;
-      RCLCPP_INFO(this->get_logger(), to_string(imu.acc.z).c_str());
+      // RCLCPP_INFO(this->get_logger(), to_string(imu.acc.z).c_str());
       // for (int i = 0 ; i < 6 ; i++)
       // {
       //     tmp.append(imu.dirty[i]?"true":"false").append(" ");
@@ -176,8 +177,7 @@ private:
   // serial::Serial ser;
   DF::Serial* ser;
   std::chrono::milliseconds timer_ms;
-  std::string imu_topic;
-  std::string imu_offline_topic;
+  std::string frame_id;
 };
 
 int main(int argc, char* argv[])

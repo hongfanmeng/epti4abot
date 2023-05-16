@@ -9,13 +9,13 @@ def generate_launch_description():
         [
             # laser driver
             Node(
-                name="rplidar_composition",
+                name="rplidar_node",
                 package="rplidar_ros",
-                executable="rplidar_composition",
+                executable="rplidar_node",
                 output="screen",
                 parameters=[
                     {
-                        "serial_port": "/dev/ttyUSB1",
+                        "serial_port": "/dev/ttyUSB0",
                         "serial_baudrate": 115200,  # A1 / A2
                         "frame_id": "laser",
                         "inverted": False,
@@ -31,11 +31,13 @@ def generate_launch_description():
                 executable="async_slam_toolbox_node",
                 output="screen",
                 parameters=[
-                    PathJoinSubstitution([
-                        FindPackageShare("epti4abot"),
-                        "config",
-                        "mapper_params_online_async.yaml",  
-                    ]),
+                    PathJoinSubstitution(
+                        [
+                            FindPackageShare("epti4abot"),
+                            "config",
+                            "mapper_params_online_async.yaml",
+                        ]
+                    ),
                 ],
             ),
             # TF transform

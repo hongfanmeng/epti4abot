@@ -11,7 +11,7 @@ def generate_launch_description():
                 executable="wit_imu_sensor",
                 name="imu_node",
                 output="screen",
-                parameters=[{"port": "/dev/ttyUSB0", "baudrate": 9600}],
+                parameters=[{"port": "/dev/ttyUSB1", "baudrate": 9600}],
             ),
             # TF transform
             Node(
@@ -19,7 +19,7 @@ def generate_launch_description():
                 package="tf2_ros",
                 executable="static_transform_publisher",
                 output="screen",
-                arguments=["0", "0", "0", "0", "0", "0", "base_link", "WitSensor"],
+                arguments=["0", "0", "0", "0", "0", "0", "base_link", "wit_sensor"],
             ),
         ]
     )
