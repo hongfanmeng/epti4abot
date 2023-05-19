@@ -78,6 +78,16 @@ hardware_interface::CallbackReturn Dfrobot::on_activate(const rclcpp_lifecycle::
 
   controller = new DF::CarController("/dev/ttyACM0", 9600);
 
+  for (auto i = 0u; i < hw_positions_.size(); i++)
+  {
+    if (std::isnan(hw_positions_[i]))
+    {
+      hw_positions_[i] = 0;
+      hw_velocities_[i] = 0;
+      hw_commands_[i] = 0;
+    }
+  }
+
   return CallbackReturn::SUCCESS;
 }
 
@@ -90,9 +100,23 @@ hardware_interface::CallbackReturn Dfrobot::on_deactivate(const rclcpp_lifecycle
   return CallbackReturn::SUCCESS;
 }
 
-hardware_interface::return_type Dfrobot::read(const rclcpp::Time& /*time*/, const rclcpp::Duration& /*period*/)
+hardware_interface::return_type Dfrobot::read(const rclcpp::Time& /*time*/, const rclcpp::Duration& period)
 {
   // TODO(anyone): read robot states
+
+  // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code
+  for (std::size_t i = 0; i < hw_velocities_.size(); i++)
+  {
+    // Simulate DiffBot wheels's movement as a first-order system
+    // Update the joint status: this is a revolute joint without any limit.
+    // Simply integrates
+    hw_positions_[i] = hw_positions_[1] + period.seconds() * hw_velocities_[i];
+
+    RCLCPP_INFO(rclcpp::get_logger("DiffBotSystemHardware"),
+                "Got position state %.5f and velocity state %.5f for '%s'!", hw_positions_[i], hw_velocities_[i],
+                info_.joints[i].name.c_str());
+  }
+  // END: This part here is for exemplary purposes - Please do not copy to your production code
 
   return hardware_interface::return_type::OK;
 }
@@ -114,6 +138,9 @@ hardware_interface::return_type Dfrobot::write(const rclcpp::Time& /*time*/, con
   usleep(10000);
   controller->setCarRight(dir_right, abs(vel_right));
   usleep(10000);
+
+  hw_velocities_[0] = hw_commands_[0];
+  hw_velocities_[1] = hw_commands_[1];
 
   // for (auto i = 0u; i < hw_commands_.size(); i++)
   // {
