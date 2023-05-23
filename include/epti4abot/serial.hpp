@@ -15,12 +15,14 @@ extern "C" {
 using namespace std;
 using namespace std::chrono;
 
-int serialOpen(const char *device, const int baud) {
+int serialOpen(const char* device, const int baud)
+{
   struct termios options;
   speed_t myBaud;
   int status, fd;
 
-  switch (baud) {
+  switch (baud)
+  {
     case 50:
       myBaud = B50;
       break;
@@ -149,29 +151,36 @@ int serialOpen(const char *device, const int baud) {
 
   ioctl(fd, TIOCMSET, &status);
 
-  usleep(1000000);  // 10mS
+  usleep(10000);  // 10mS
 
   return fd;
 }
 
-namespace DF {
+namespace DF
+{
 
-class Serial {
- public:
-  Serial(const std::string &deviceName, int baud)
-      : deviceName_(deviceName), baud_(baud) {
+class Serial
+{
+public:
+  Serial(const std::string& deviceName, int baud) : deviceName_(deviceName), baud_(baud)
+  {
     handle_ = serialOpen(deviceName.c_str(), baud_);
-    usleep(1000000);
+    usleep(10000);
   }
 
-  ~Serial() {
-    if (handle_ >= 0) {
+  ~Serial()
+  {
+    if (handle_ >= 0)
+    {
       close(handle_);
     }
   }
 
   /* returns if the connection is successfully opened */
-  bool isOpened() const { return handle_ >= 0; }
+  bool isOpened() const
+  {
+    return handle_ >= 0;
+  }
 
   /**
    * send functions, return if all char is successfully sent
@@ -182,24 +191,30 @@ class Serial {
    * If you get a bug, try to add `for (int j = 0; j < 1000000; ++j)`
    * after sending a char. Don't ask me why... it works...
    */
-  bool send(const char value) const {
-    if (!isOpened()) {
+  bool send(const char value) const
+  {
+    if (!isOpened())
+    {
       return false;
     }
     unsigned rev = write(handle_, &value, 1);
     return rev == 1;
   }
 
-  bool send(const std::string &value) const {
-    if (!isOpened()) {
+  bool send(const std::string& value) const
+  {
+    if (!isOpened())
+    {
       return false;
     }
     unsigned rev = write(handle_, value.c_str(), value.size());
     return rev == value.size();
   }
 
-  bool sendline(const std::string &value) const {
-    if (!isOpened()) {
+  bool sendline(const std::string& value) const
+  {
+    if (!isOpened())
+    {
       return false;
     }
     return send(value + "\n");
@@ -212,18 +227,22 @@ class Serial {
    * @param force, if force read enough byte before return
    *
    */
-  std::string recv(const unsigned size, const bool force = false) const {
-    if (!isOpened()) {
+  std::string recv(const unsigned size, const bool force = false) const
+  {
+    if (!isOpened())
+    {
       throw "Port not opened";
     }
 
     unsigned rev, curRev;
-    char *buf = new char[size];
+    char* buf = new char[size];
 
     rev = 0;
-    while (rev < size) {
+    while (rev < size)
+    {
       curRev = read(handle_, buf + rev, size - rev);
-      if (curRev == 0 && !force) {
+      if (curRev == 0 && !force)
+      {
         break;
       }
       rev += curRev;
@@ -239,25 +258,29 @@ class Serial {
    * @param maxSize maxSize to receive
    * @param timeout max timeout in milliseconds of reaching EOF
    */
-  std::string recvUntil(const char ch, const unsigned maxSize = 1024,
-                        const unsigned timeout = 0) const {
-    if (!isOpened()) {
+  std::string recvUntil(const char ch, const unsigned maxSize = 1024, const unsigned timeout = 0) const
+  {
+    if (!isOpened())
+    {
       throw "Port not opened";
     }
 
     unsigned rev, curRev;
-    char *buf = new char[maxSize];
+    char* buf = new char[maxSize];
 
     rev = 0;
     auto start = high_resolution_clock::now();
-    while (true) {
+    while (true)
+    {
       curRev = read(handle_, buf + rev, maxSize - rev);
       rev += curRev;
-      if (rev > 0 && buf[rev - 1] == ch) {
+      if (rev > 0 && buf[rev - 1] == ch)
+      {
         break;
       }
       auto end = high_resolution_clock::now();
-      if (timeout != 0 && difftime(start, end) > timeout) {
+      if (timeout != 0 && difftime(start, end) > timeout)
+      {
         throw "Timeout";
       }
     }
@@ -268,26 +291,29 @@ class Serial {
     return data;
   }
 
-  std::string recvUntil(const std::string &charset,
-                        const unsigned maxSize = 1024,
-                        const unsigned timeout = 0) const {
-    if (!isOpened()) {
+  std::string recvUntil(const std::string& charset, const unsigned maxSize = 1024, const unsigned timeout = 0) const
+  {
+    if (!isOpened())
+    {
       throw "Port not opened";
     }
 
     unsigned rev, curRev;
-    char *buf = new char[maxSize];
+    char* buf = new char[maxSize];
 
     rev = 0;
     auto start = high_resolution_clock::now();
-    while (true) {
+    while (true)
+    {
       curRev = read(handle_, buf + rev, maxSize - rev);
       rev += curRev;
-      if (rev > 0 && charset.find(buf[rev - 1]) != std::string::npos) {
+      if (rev > 0 && charset.find(buf[rev - 1]) != std::string::npos)
+      {
         break;
       }
       auto end = high_resolution_clock::now();
-      if (timeout != 0 && difftime(start, end) > timeout) {
+      if (timeout != 0 && difftime(start, end) > timeout)
+      {
         throw "Timeout";
       }
     }
@@ -298,11 +324,12 @@ class Serial {
     return data;
   }
 
-  std::string recvline(const unsigned timeout = 0) const {
+  std::string recvline(const unsigned timeout = 0) const
+  {
     return recvUntil('\n', 1024, timeout);
   }
 
- private:
+private:
   int handle_;
   const std::string deviceName_;
   const int baud_;
@@ -313,8 +340,8 @@ class Serial {
    * @param start
    * @param end
    */
-  long long difftime(chrono::_V2::system_clock::time_point start,
-                     chrono::_V2::system_clock::time_point end) const {
+  long long difftime(chrono::_V2::system_clock::time_point start, chrono::_V2::system_clock::time_point end) const
+  {
     return chrono::duration_cast<chrono::milliseconds>(end - start).count();
   }
 };

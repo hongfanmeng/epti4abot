@@ -4,13 +4,13 @@ ekf_filter_node:
     # The frequency, in Hz, at which the filter will output a position estimate. Note that the filter will not begin
     # computation until it receives at least one message from one of theinputs. It will then run continuously at the
     # frequency specified here, regardless of whether it receives more measurements. Defaults to 30 if unspecified.
-    frequency: 20.0
+    frequency: 30.0
 
     # ekf_localization_node and ukf_localization_node both use a 3D omnidirectional motion model. If this parameter is
     # set to true, no 3D information will be used in your state estimate. Use this if you are operating in a planar
     # environment and want to ignore the effect of small variations in the ground plane that might otherwise be detected
     # by, for example, an IMU. Defaults to false if unspecified.
-    two_d_mode: false
+    two_d_mode: true
 
     # Whether to publish the acceleration state. Defaults to false if unspecified.
     publish_acceleration: true
@@ -32,53 +32,42 @@ ekf_filter_node:
     base_link_frame: base_link # Defaults to "base_link" ifunspecified
     world_frame: odom # Defaults to the value ofodom_frame if unspecified
 
-    odom0: /diffbot_base_controller/odom
-    odom0_config: [false,  false,  false,
+    odom0: diffbot_base_controller/odom
+    odom0_config: [true,  true,  false,
                     false, false, false,
                     false, false, false,
                     false, false, false,
                     false, false, false]
 
-    imu0: /imu
-    imu0_config: [false, false, false,
-                  true,  true,  true,
-                  false, false, false,
-                  false, false, false,
-                  true, true, false]
-
-    odom0_differential: false
+    odom0_differential: true
     odom0_relative: false
-    odom0_queue_size: 5
+    odom0_queue_size: 1
+
+    imu0: imu
+    imu0_config: [false, false, false,
+                  false,  false,  true,
+                  false, false, false,
+                  false, false, false,
+                  false, false, false]
 
     imu0_differential: false
     imu0_relative: false
     imu0_queue_size: 5
+
     # imu0_pose_rejection_threshold: 0.8                 # Note the difference in parameter names
     # imu0_twist_rejection_threshold: 0.8                #
-    imu0_linear_acceleration_rejection_threshold: 0.8  #
+    # imu0_linear_acceleration_rejection_threshold: 10.0  #
     # imu0_remove_gravitational_acceleration: true
 
+    # use_control: true
+    # stamped_control: false
+    # # control_timeout: 0.2
+    # control_config: [true, false, false, false, false, false]
+    # acceleration_limits: [1.3, 0.0, 0.0, 0.0, 0.0, 0.0]
+    # deceleration_limits: [1.3, 0.0, 0.0, 0.0, 0.0, 0.0]
+    # acceleration_gains: [0.8, 0.0, 0.0, 0.0, 0.0, 0.0]
+    # deceleration_gains: [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     
-    # print_diagnostics: true
-    # debug: false
-    # debug_out_file: debug_ekf_localization.txt
 
-  
-    # process_noise_covariance: [0.05, 0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
-    #                            0.0,    0.05, 0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
-    #                            0.0,    0.0,    0.06, 0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
-    #                            0.0,    0.0,    0.0,    0.03, 0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
-    #                            0.0,    0.0,    0.0,    0.0,    0.03, 0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
-    #                            0.0,    0.0,    0.0,    0.0,    0.0,    0.06, 0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
-    #                            0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.025, 0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
-    #                            0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.025, 0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
-    #                            0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.04, 0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
-    #                            0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.01, 0.0,    0.0,    0.0,    0.0,    0.0,
-    #                            0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.01, 0.0,    0.0,    0.0,    0.0,
-    #                            0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.02, 0.0,    0.0,    0.0,
-    #                            0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.01, 0.0,    0.0,
-    #                            0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.01, 0.0,
-    #                            0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.015]
-
-    process_noise_covariance: [1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9]
+    process_noise_covariance: [0.1, 0.1, 0.0, 0.0, 0.0, 0.06, 0.1, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     initial_estimate_covariance: [1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9]

@@ -23,8 +23,9 @@ class WitImuNode : public rclcpp::Node
 public:
   WitImuNode() : Node("wit_imu_node")
   {
-    std::string port;
-    int baudrate, update_rate;
+    // std::string port;
+    // int baudrate, update_rate;
+    int update_rate;
 
     port = this->declare_parameter<std::string>("port", "/dev/ttyUSB0");
     baudrate = this->declare_parameter<int>("baudrate", 9600);
@@ -67,6 +68,9 @@ private:
     int count = str.size();
     if (count == 0)
     {
+      RCLCPP_INFO(this->get_logger(), "no data recv.");
+      delete ser;
+      ser = new DF::Serial(port, baudrate);
       return;
     }
     imu.FetchData((char*)str.c_str(), count);
@@ -108,6 +112,8 @@ private:
   Wit::JY61P imu;
   DF::Serial* ser;
   std::string frame_id;
+  std::string port;
+  int baudrate;
 };
 
 int main(int argc, char* argv[])
