@@ -38,6 +38,7 @@ def generate_launch_description():
                             "mapper_params_online_async.yaml",
                         ]
                     ),
+                    {"use_sim_time": False},
                 ],
             ),
             # TF transform
